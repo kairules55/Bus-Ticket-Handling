@@ -55,7 +55,7 @@ class AdminController {
       seat.save();
 
       return response.json(200, {
-        message: "Ticked Closed!!!"
+        message: "Ticked Closed!"
       });
     } catch (error) {
       return response.json(500, {
@@ -81,6 +81,60 @@ class AdminController {
           message: "Ticket Opened!"
         });
       }
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
+
+  async allTicketStatus(request, response) {
+    try {
+      const tickets = await Ticket.find({ bus: request.body.bus });
+      return response.json(200, {
+        data: {
+          tickets: tickets
+        },
+        message: "All Ticket Details!"
+      });
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
+
+  async allOpenTicket(request, response) {
+    try {
+      const tickets = await Ticket.find({
+        bus: request.body.bus,
+        status: true
+      });
+      return response.json(200, {
+        data: {
+          tickets: tickets
+        },
+        message: "All Open Ticket!"
+      });
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
+
+  async allCloseTicket(request, response) {
+    try {
+      const tickets = await Ticket.find({
+        bus: request.body.bus,
+        status: false
+      });
+      return response.json(200, {
+        data: {
+          tickets: tickets
+        },
+        message: "All Close Ticket!"
+      });
     } catch (error) {
       return response.json(500, {
         message: "Internal Server Error" + error
