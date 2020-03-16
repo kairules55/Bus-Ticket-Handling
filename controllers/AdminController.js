@@ -141,6 +141,53 @@ class AdminController {
       });
     }
   }
+
+  async userDetail(request, response) {
+    try {
+      const ticket = await Ticket.findById(request.body.ticket);
+      return response.json(200, {
+        data: {
+          name: ticket.name
+        },
+        message: "User Details"
+      });
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
+
+  async resetTickets(request, response) {
+    try {
+      await Seat.updateMany(
+        {
+          bus: request.body.bus
+        },
+        {
+          booked: false
+        }
+      );
+
+      await Ticket.updateMany(
+        {
+          bus: request.body.bus
+        },
+        {
+          status: false
+        }
+      );
+
+      response.json(200, {
+        message: "Reset All Bus Ticket!"
+      });
+
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
 }
 
 module.exports = AdminController;
