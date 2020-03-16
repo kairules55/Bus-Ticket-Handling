@@ -1,6 +1,11 @@
+//Import Express
 const express = require("express");
 const port = 8000;
 
+//Importing Database
+const db = require("./confid/mongoose");
+
+//Express App
 const app = express();
 
 //Middleware
