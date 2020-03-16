@@ -3,15 +3,14 @@ const express = require("express");
 const port = 8000;
 
 //Importing Database
-const db = require("./confid/mongoose");
+const db = require("./config/mongoose");
 
 //Express App
 const app = express();
 
 //Middleware
 app.use(express.urlencoded());
-
-//Routes
+app.use("/", require("./routes"));
 
 //Starting the server
 app.listen(port, function(error) {
