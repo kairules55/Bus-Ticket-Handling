@@ -5,13 +5,19 @@ class AdminController {
   async createBus(request, response) {
     try {
       const bus = await Bus.create(request.body);
-      Bus.createSeats(bus, request.body.totalSeats);
+      await bus.createSeats(request.body.totalSeats);
+
+      const createdBus = await Bus.findById(bus._id);
+
       return response.json(200, {
+        data: {
+          bus: createdBus
+        },
         message: "Bus Created!"
       });
     } catch (error) {
       return response.json(500, {
-        message: "Internal Server Error"
+        message: "Internal Server Error" + error
       });
     }
   }
@@ -30,9 +36,14 @@ class AdminController {
           bus: request.body.bus,
           seat: request.body.seat
         });
+        await ticket.populate("seat");
         seat.booked = true;
-        seat.save();
+        await seat.save();
+        await ticket.save();
         return response.json(200, {
+          data: {
+            ticket: ticket
+          },
           message: "Ticket Created"
         });
       }
@@ -45,16 +56,21 @@ class AdminController {
 
   async closeTicket(request, response) {
     try {
-      const ticket = await Ticket.findById(request.body.ticket);
+      const ticket = await Ticket.findById(request.body.ticket).populate(
+        "seat"
+      );
       const seat = await Seat.findById(ticket.seat);
 
       ticket.status = false;
       seat.booked = false;
 
-      ticket.save();
-      seat.save();
+      await ticket.save();
+      await seat.save();
 
       return response.json(200, {
+        data: {
+          ticket: ticket
+        },
         message: "Ticked Closed!"
       });
     } catch (error) {
@@ -75,9 +91,12 @@ class AdminController {
       } else {
         ticket.status = true;
         seat.booked = true;
-        ticket.save();
-        seat.save();
+        await ticket.save();
+        await seat.save();
         return response.json(200, {
+          data: {
+            ticket: ticket
+          },
           message: "Ticket Opened!"
         });
       }
@@ -90,7 +109,9 @@ class AdminController {
 
   async allTicketStatus(request, response) {
     try {
-      const tickets = await Ticket.find({ bus: request.body.bus });
+      const tickets = await Ticket.find({
+        bus: request.body.bus
+      }).populate("seat");
       return response.json(200, {
         data: {
           tickets: tickets
@@ -109,7 +130,7 @@ class AdminController {
       const tickets = await Ticket.find({
         bus: request.body.bus,
         status: true
-      });
+      }).populate("seat");
       return response.json(200, {
         data: {
           tickets: tickets
@@ -128,7 +149,7 @@ class AdminController {
       const tickets = await Ticket.find({
         bus: request.body.bus,
         status: false
-      });
+      }).populate("seat");
       return response.json(200, {
         data: {
           tickets: tickets
@@ -179,9 +200,45 @@ class AdminController {
       );
 
       response.json(200, {
+        data: {
+          bus: bus
+        },
         message: "Reset All Bus Ticket!"
       });
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
 
+  async notBookedSeats(request, response) {
+    try {
+      const seats = await Seat.find({ bus: request.body.bus });
+      return response
+        .json(200, {
+          data: {
+            seats: seats
+          },
+          message: "All Non Booked Seats!"
+        })
+        .populate("seat");
+    } catch (error) {
+      return response.json(500, {
+        message: "Internal Server Error" + error
+      });
+    }
+  }
+
+  async buses(request, response) {
+    try {
+      const buses = await Bus.find({});
+      return response.json(200, {
+        data: {
+          buses: buses
+        },
+        message: "All Buses!"
+      });
     } catch (error) {
       return response.json(500, {
         message: "Internal Server Error" + error

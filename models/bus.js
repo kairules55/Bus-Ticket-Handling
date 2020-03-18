@@ -23,17 +23,18 @@ const busSchema = new mongoose.Schema(
   }
 );
 
-busSchema.statics.createSeats = async function(bus, totalSeats) {
+busSchema.methods.createSeats = async function(totalSeats) {
+  let self = this;
   try {
     for (let i = 1; i <= totalSeats; i++) {
       const seat = await Seat.create({
         number: i,
         booked: false,
-        bus: bus
+        bus: self._id
       });
-      bus.seats.push(seat);
+      await self.seats.push(seat);
     }
-    bus.save();
+    await self.save();
     console.log("Seats Created!");
   } catch (error) {
     console.log("Error while creating seats " + error);

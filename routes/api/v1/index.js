@@ -12,6 +12,8 @@ router.post("/all-ticket-status", adminController.allTicketStatus);
 router.post("/all-open-ticket", adminController.allOpenTicket);
 router.post("/all-close-ticket", adminController.allCloseTicket);
 router.post("/user-detail", adminController.userDetail);
-router.post("/reset-ticket",adminController.resetTickets);
+router.post("/reset-ticket", adminController.resetTickets);
+router.post("/all-non-booked", adminController.notBookedSeats);
+router.post("/buses", adminController.buses);
 
 module.exports = router;
