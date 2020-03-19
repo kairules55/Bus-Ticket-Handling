@@ -4,7 +4,7 @@
   "description": "A ticket handler for a bus company build using node.js and express framework backed by a mongodb database",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/kairules55/Bus-Ticket-Handling#readme",
   "dependencies": {
+    "chai-http": "^4.3.0",
     "express": "^4.17.1",
     "mongoose": "^5.9.4"
-  }
+  },
+  "devDependencies": {}
 }

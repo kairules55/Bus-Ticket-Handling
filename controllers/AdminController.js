@@ -24,7 +24,9 @@ class AdminController {
 
   async createTicket(request, response) {
     try {
+      const bus = await Seat.findById(request.body.bus);
       const seat = await Seat.findById(request.body.seat);
+
       if (seat.booked) {
         return response.json(400, {
           message: "Seat Already Booked"
@@ -56,7 +58,7 @@ class AdminController {
 
   async closeTicket(request, response) {
     try {
-      const ticket = await Ticket.findById(request.body.ticket).populate(
+      let ticket = await Ticket.findById(request.body.ticket).populate(
         "seat"
       );
       const seat = await Seat.findById(ticket.seat);
@@ -67,6 +69,7 @@ class AdminController {
       await ticket.save();
       await seat.save();
 
+      ticket = await Ticket.findById(request.body.ticket).populate("seat");
       return response.json(200, {
         data: {
           ticket: ticket
@@ -82,7 +85,7 @@ class AdminController {
 
   async openTicket(request, response) {
     try {
-      const ticket = await Ticket.findById(request.body.ticket);
+      let ticket = await Ticket.findById(request.body.ticket);
       const seat = await Seat.findById(ticket.seat);
       if (seat.booked) {
         return response.json(400, {
@@ -93,6 +96,7 @@ class AdminController {
         seat.booked = true;
         await ticket.save();
         await seat.save();
+        ticket = await Ticket.findById(request.body.ticket).populate("seat");
         return response.json(200, {
           data: {
             ticket: ticket
@@ -198,6 +202,8 @@ class AdminController {
           status: false
         }
       );
+
+      const bus = await Bus.findById(request.body.bus);
 
       response.json(200, {
         data: {
